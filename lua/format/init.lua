@@ -10,7 +10,7 @@ end
 
 local cp_file = function(bufnr, file_path)
 	local new_file_path = utils.parent_path(file_path) .. "/_" .. utils.file_name(file_path)
-	utils.copy_buf_to_file(bufnr, file_path)
+	utils.copy_buf_to_file(bufnr, new_file_path)
 	return new_file_path
 end
 
@@ -54,11 +54,11 @@ local format = function()
 	end
 	local file_path = vim.api.nvim_buf_get_name(0)
 	local temp_file = cp_file(bufnr, file_path)
-	-- local conf_list = static.config.filetypes[filetype](temp_file)
-	-- local on_job_success = use_on_job_success(temp_file, bufnr, changed_tick)
-	-- job(conf_list, on_job_success, function()
-	-- 	uv.fs_unlink(temp_file)
-	-- end)
+	local conf_list = static.config.filetypes[filetype](temp_file)
+	local on_job_success = use_on_job_success(temp_file, bufnr, changed_tick)
+	job(conf_list, on_job_success, function()
+		uv.fs_unlink(temp_file)
+	end)
 end
 
 return { setup = setup, format = format }

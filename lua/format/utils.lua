@@ -1,5 +1,3 @@
-local core = require("niuiic-core")
-
 local file_name = function(file_path)
 	return string.match(file_path, "([^/]+)$")
 end
@@ -38,16 +36,7 @@ end
 
 local copy_buf_to_file = function(bufnr, file_path)
 	local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-	local file = io.open(file_path, "w")
-	if not file then
-		return
-	end
-	local text = core.lua.list.reduce(lines, function(prev_res, item)
-		return prev_res .. "\n" .. item
-	end, "")
-	file:write(text)
-	file:flush()
-	file:close()
+	vim.fn.writefile(lines, file_path)
 end
 
 return {
