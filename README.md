@@ -33,6 +33,7 @@ require("format").setup({
 		javascript = require("format.builtins.prettier"),
 		typescript = require("format.builtins.prettier"),
 		rust = require("format.builtins.rustfmt"),
+		-- ...
 	},
 })
 ```
@@ -40,13 +41,13 @@ require("format").setup({
 Format configuration sample.
 
 ```lua
-return function(file_path)
+javascript = function(file_path)
 	return {
 		-- the first task
 		{
 			cmd = "prettier",
 			args = {
-				-- this plugin copies the current buffer contents to a temporary file, and format this file, then write back to the buffer, thus, you need to make sure the formatter can write to the file
+				-- this plugin copies content of current buffer to a temporary file, and format this file, then write back to the buffer, thus, you need to make sure the formatter can write to the file
 				"-w",
 				file_path,
 			},
@@ -59,9 +60,7 @@ return function(file_path)
 		{
 			cmd = "eslint",
 			args = {
-				"fix",
-				"--allow-dirty",
-				"--allow-no-vcs",
+				"--fix",
 				file_path,
 				-- just try to fix error
 				ignore_err = function()
