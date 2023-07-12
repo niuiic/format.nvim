@@ -2,6 +2,10 @@
 
 An asynchronous, multitasking, and highly configurable formatting plugin.
 
+## Dependencies
+
+- [niuiic-core.nvim](https://github.com/niuiic/niuiic-core.nvim)
+
 ## Usage
 
 Just call `require("format").format()`.
