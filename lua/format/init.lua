@@ -23,19 +23,21 @@ local use_on_job_success = function(temp_file, bufnr, changed_tick)
 		end
 
 		local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-		vim.schedule(function()
-			local new_lines = vim.fn.readfile(temp_file)
-			if static.config.update_same or not utils.lists_are_same(lines, new_lines) then
-				vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, new_lines)
-			end
-			uv.fs_unlink(temp_file)
-		end)
+		local new_lines = vim.fn.readfile(temp_file)
+		if static.config.update_same or not utils.lists_are_same(lines, new_lines) then
+			vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, new_lines)
+		end
+		uv.fs_unlink(temp_file)
 
 		return true
 	end
 end
 
 local format = function()
+	if job.running then
+		vim.notify("Previous formatting job is running", vim.log.levels.WARN, { title = "Format" })
+		return
+	end
 	local changed_tick = vim.api.nvim_buf_get_changedtick(0)
 	local bufnr = vim.api.nvim_win_get_buf(0)
 	local filetype = vim.api.nvim_get_option_value("filetype", {
@@ -56,7 +58,7 @@ local format = function()
 	local temp_file = cp_file(bufnr, file_path)
 	local conf_list = static.config.filetypes[filetype](temp_file)
 	local on_job_success = use_on_job_success(temp_file, bufnr, changed_tick)
-	job(conf_list, on_job_success, function()
+	job.spawn(conf_list, on_job_success, function()
 		uv.fs_unlink(temp_file)
 	end)
 end

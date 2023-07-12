@@ -1,7 +1,7 @@
 local core = require("niuiic-core")
 local static = require("format.static")
 
----@class Config
+---@class format.config
 ---@field cmd string
 ---@field args string[]
 ---@field options {env?: table<string, any>, cwd?: string, uid?: number, gid?: number, verbatim?: boolean, detached?: boolean, hide?: boolean, timeout?: number} | nil
@@ -9,11 +9,13 @@ local static = require("format.static")
 ---@field on_err fun(err: string | nil, data: string | nil) | nil
 ---@field ignore_err fun(err: string | nil, data: string | nil): boolean | nil
 
-local job
----@param conf_list Config[]
+local running = false
+
+local spawn
+---@param conf_list format.config[]
 ---@param on_success fun(): boolean
 ---@param on_err fun()
-job = function(conf_list, on_success, on_err)
+spawn = function(conf_list, on_success, on_err)
 	if #conf_list == 0 then
 		return
 	end
@@ -26,7 +28,7 @@ job = function(conf_list, on_success, on_err)
 	local on_job_success
 	if #conf_list > 1 then
 		on_job_success = function()
-			job(
+			spawn(
 				core.lua.list.filter(conf_list, function(_, i)
 					return i > 1
 				end),
@@ -35,7 +37,7 @@ job = function(conf_list, on_success, on_err)
 			)
 		end
 	else
-		on_job_success = function(err, data)
+		on_job_success = vim.schedule_wrap(function(err, data)
 			local success = on_success()
 			if success then
 				if config.on_success then
@@ -46,7 +48,8 @@ job = function(conf_list, on_success, on_err)
 			else
 				config.on_err(err, data)
 			end
-		end
+			running = false
+		end)
 	end
 
 	-- set on_err
@@ -61,18 +64,24 @@ job = function(conf_list, on_success, on_err)
 				static.config.hooks.on_err(err, data)
 			end
 		end
+		running = false
 	end
 
 	-- start job
 	local handle = core.job.spawn(config.cmd, config.args, config.options, on_job_success, on_job_err)
+	running = true
 
 	-- resolve timeout
 	if config.options.timeout then
 		core.timer.set_timeout(function()
 			handle.terminate()
 			static.config.hooks.on_timeout()
+			running = false
 		end, config.options.timeout)
 	end
 end
 
-return job
+return {
+	running = running,
+	spawn = spawn,
+}

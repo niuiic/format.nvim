@@ -14,10 +14,27 @@ local config = {
 		end,
 	},
 	filetypes = {
+		-- stylua
 		lua = require("format.builtins.stylua"),
+		-- rustfmt
+		rust = require("format.builtins.rustfmt"),
+		-- prettier
 		javascript = require("format.builtins.prettier"),
 		typescript = require("format.builtins.prettier"),
-		rust = require("format.builtins.rustfmt"),
+		markdown = require("format.builtins.prettier"),
+		javascriptreact = require("format.builtins.prettier"),
+		typescriptreact = require("format.builtins.prettier"),
+		vue = require("format.builtins.prettier"),
+		css = require("format.builtins.prettier"),
+		scss = require("format.builtins.prettier"),
+		less = require("format.builtins.prettier"),
+		html = require("format.builtins.prettier"),
+		json = require("format.builtins.prettier"),
+		graphql = require("format.builtins.prettier"),
+		yaml = require("format.builtins.prettier"),
+		dot = require("format.builtins.prettier"),
+		tex = require("format.builtins.prettier"),
+		plaintex = require("format.builtins.prettier"),
 	},
 }
 
