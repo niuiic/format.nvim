@@ -66,8 +66,8 @@ javascript = function(file_path)
 			args = {
 				"--fix",
 				file_path,
-				-- just try to fix error
 			},
+			-- just try to fix error
 			ignore_err = function()
 				return true
 			end,
