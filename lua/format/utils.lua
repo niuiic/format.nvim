@@ -21,7 +21,7 @@ local buf_is_valid = function(bufnr, changed_tick)
 end
 
 local lists_are_same = function(list1, list2)
-	if #list1 ~= list2 then
+	if #list1 ~= #list2 then
 		return false
 	end
 	local is_same = true
