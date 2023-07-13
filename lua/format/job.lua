@@ -10,6 +10,9 @@ local static = require("format.static")
 ---@field ignore_err fun(err: string | nil, data: string | nil): boolean | nil
 
 local running = false
+local is_running = function()
+	return running
+end
 
 local spawn
 ---@param conf_list format.config[]
@@ -25,6 +28,7 @@ spawn = function(conf_list, on_success, on_err)
 	config.options = config.options or {}
 
 	-- set on_success
+	---@type fun(err: string, data: string)
 	local on_job_success
 	if #conf_list > 1 then
 		on_job_success = function()
@@ -63,8 +67,8 @@ spawn = function(conf_list, on_success, on_err)
 			else
 				static.config.hooks.on_err(err, data)
 			end
+			running = false
 		end
-		running = false
 	end
 
 	-- start job
@@ -82,6 +86,6 @@ spawn = function(conf_list, on_success, on_err)
 end
 
 return {
-	running = running,
+	is_running = is_running,
 	spawn = spawn,
 }

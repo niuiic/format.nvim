@@ -34,29 +34,24 @@ local use_on_job_success = function(temp_file, bufnr, changed_tick)
 end
 
 local format = function()
-	if job.running then
+	if job.is_running() then
 		vim.notify("Previous formatting job is running", vim.log.levels.WARN, { title = "Format" })
 		return
 	end
-	local changed_tick = vim.api.nvim_buf_get_changedtick(0)
-	local bufnr = vim.api.nvim_win_get_buf(0)
-	local filetype = vim.api.nvim_get_option_value("filetype", {
-		buf = 0,
-	})
-	if not filetype then
-		utils.on_not_support()
-		return
-	end
+
 	local supported_filetypes = core.lua.table.keys(static.config.filetypes)
 	if not core.lua.list.find(supported_filetypes, function(ft)
-		return ft == filetype
+		return ft == vim.bo.filetype
 	end) then
-		utils.on_not_support()
+		vim.notify("This filetype is not supported", vim.log.levels.ERROR, { title = "Format" })
 		return
 	end
+
+	local changed_tick = vim.api.nvim_buf_get_changedtick(0)
+	local bufnr = vim.api.nvim_win_get_buf(0)
 	local file_path = vim.api.nvim_buf_get_name(0)
 	local temp_file = cp_file(bufnr, file_path)
-	local conf_list = static.config.filetypes[filetype](temp_file)
+	local conf_list = static.config.filetypes[vim.bo.filetype](temp_file)
 	local on_job_success = use_on_job_success(temp_file, bufnr, changed_tick)
 	job.spawn(conf_list, on_job_success, function()
 		uv.fs_unlink(temp_file)
