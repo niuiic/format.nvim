@@ -29,9 +29,9 @@ spawn = function(conf_list, on_success, on_err)
 
 	-- set on_success
 	---@type fun(code: integer, signal: integer)
-	local on_job_success
+	local on_job_exit
 	if #conf_list > 1 then
-		on_job_success = function()
+		on_job_exit = function()
 			spawn(
 				core.lua.list.filter(conf_list, function(_, i)
 					return i > 1
@@ -41,7 +41,7 @@ spawn = function(conf_list, on_success, on_err)
 			)
 		end
 	else
-		on_job_success = function(code, signal)
+		on_job_exit = function(code, signal)
 			if not running then
 				return
 			end
@@ -81,7 +81,7 @@ spawn = function(conf_list, on_success, on_err)
 	end
 
 	-- start job
-	local handle = core.job.spawn(config.cmd, config.args, config.options, on_job_success, on_job_err)
+	local handle = core.job.spawn(config.cmd, config.args, config.options, on_job_exit, on_job_err)
 	running = true
 
 	-- resolve timeout
