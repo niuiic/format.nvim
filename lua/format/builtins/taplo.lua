@@ -3,6 +3,7 @@ return function(file_path)
 		{
 			cmd = "taplo",
 			args = {
+				"format",
 				file_path,
 			},
 			ignore_err = function()
