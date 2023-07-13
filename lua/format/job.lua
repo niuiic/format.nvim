@@ -27,7 +27,7 @@ spawn = function(conf_list, on_success, on_err)
 	local config = conf_list[1]
 	config.options = config.options or {}
 
-	-- set on_success
+	-- set on exit
 	---@type fun(code: integer, signal: integer)
 	local on_job_exit
 	if #conf_list > 1 then
@@ -42,9 +42,6 @@ spawn = function(conf_list, on_success, on_err)
 		end
 	else
 		on_job_exit = function(code, signal)
-			if not running then
-				return
-			end
 			local success = on_success()
 			if success then
 				if config.on_success then
@@ -63,10 +60,6 @@ spawn = function(conf_list, on_success, on_err)
 
 	-- set on_err
 	local on_job_err = function(err, data)
-		if not running then
-			return
-		end
-
 		if config.ignore_err and config.ignore_err(err, data) then
 			return
 		end
