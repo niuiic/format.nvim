@@ -19,16 +19,17 @@ local use_on_job_success = function(temp_file, bufnr, changed_tick)
 		local valid, err = utils.buf_is_valid(bufnr, changed_tick)
 		if not valid then
 			vim.notify(err, vim.log.levels.ERROR, { title = "Format" })
+			uv.fs_unlink(temp_file)
 			return false
 		end
 
 		local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
 		local new_lines = vim.fn.readfile(temp_file)
-		if static.config.update_same or not utils.lists_are_same(lines, new_lines) then
+		if not utils.lists_are_same(lines, new_lines) then
 			vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, new_lines)
 		end
-		uv.fs_unlink(temp_file)
 
+		uv.fs_unlink(temp_file)
 		return true
 	end
 end

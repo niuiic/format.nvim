@@ -5,7 +5,7 @@ local static = require("format.static")
 ---@field cmd string
 ---@field args string[]
 ---@field options {env?: table<string, any>, cwd?: string, uid?: number, gid?: number, verbatim?: boolean, detached?: boolean, hide?: boolean, timeout?: number} | nil
----@field on_success fun(err: string | nil, data: string | nil) | nil
+---@field on_success fun(code: integer, signal: integer) | nil
 ---@field on_err fun(err: string | nil, data: string | nil) | nil
 ---@field ignore_err fun(err: string | nil, data: string | nil): boolean | nil
 
@@ -28,7 +28,7 @@ spawn = function(conf_list, on_success, on_err)
 	config.options = config.options or {}
 
 	-- set on_success
-	---@type fun(err: string, data: string)
+	---@type fun(code: integer, signal: integer)
 	local on_job_success
 	if #conf_list > 1 then
 		on_job_success = function()
@@ -41,34 +41,43 @@ spawn = function(conf_list, on_success, on_err)
 			)
 		end
 	else
-		on_job_success = vim.schedule_wrap(function(err, data)
+		on_job_success = function(code, signal)
+			if not running then
+				return
+			end
 			local success = on_success()
 			if success then
 				if config.on_success then
-					config.on_success(err, data)
+					config.on_success(code, signal)
 				else
-					static.config.hooks.on_success(err, data)
+					static.config.hooks.on_success(code, signal)
 				end
 			else
-				config.on_err(err, data)
+				if config.on_err then
+					config.on_err(nil, nil)
+				end
 			end
 			running = false
-		end)
+		end
 	end
 
 	-- set on_err
 	local on_job_err = function(err, data)
-		if config.ignore_err and config.ignore_err(err, data) then
-			on_job_success(err, data)
-		else
-			on_err()
-			if config.on_err then
-				config.on_err(err, data)
-			else
-				static.config.hooks.on_err(err, data)
-			end
-			running = false
+		if not running then
+			return
 		end
+
+		if config.ignore_err and config.ignore_err(err, data) then
+			return
+		end
+
+		on_err()
+		if config.on_err then
+			config.on_err(err, data)
+		else
+			static.config.hooks.on_err(err, data)
+		end
+		running = false
 	end
 
 	-- start job
@@ -79,6 +88,7 @@ spawn = function(conf_list, on_success, on_err)
 	if config.options.timeout then
 		core.timer.set_timeout(function()
 			handle.terminate()
+			on_err()
 			static.config.hooks.on_timeout()
 			running = false
 		end, config.options.timeout)

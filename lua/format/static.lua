@@ -1,7 +1,6 @@
 local config = {
-	update_same = false,
 	hooks = {
-		---@type fun(err: string | nil, data: string | nil) | nil
+		---@type fun(code: integer, signal: integer) | nil
 		on_success = function()
 			vim.notify("Formatting Succeed", vim.log.levels.INFO, { title = "Format" })
 		end,
@@ -35,6 +34,15 @@ local config = {
 		dot = require("format.builtins.prettier"),
 		tex = require("format.builtins.prettier"),
 		plaintex = require("format.builtins.prettier"),
+		-- black
+		python = require("format.builtins.black"),
+		-- shfmt
+		sh = require("format.builtins.shfmt"),
+		zsh = require("format.builtins.shfmt"),
+		-- sqlfluff
+		sql = require("format.builtins.sqlfluff"),
+		-- taplo
+		toml = require("format.builtins.taplo"),
 	},
 }
 

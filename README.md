@@ -16,8 +16,6 @@ Default configuration here.
 
 ```lua
 require("format").setup({
-	-- whether to update buffer if there is no change after formatting
-	update_same = false,
 	hooks = {
 		---@type fun(err: string | nil, data: string | nil) | nil
 		on_success = function()
