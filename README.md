@@ -16,8 +16,9 @@ Default configuration here.
 
 ```lua
 require("format").setup({
+	update_on_buf_changed = false,
 	hooks = {
-		---@type fun(err: string | nil, data: string | nil) | nil
+		---@type fun(code: integer, signal: integer) | nil
 		on_success = function()
 			vim.notify("Formatting Succeed", vim.log.levels.INFO, { title = "Format" })
 		end,
@@ -32,9 +33,9 @@ require("format").setup({
 	filetypes = {
 		-- see format configuration below
 		lua = require("format.builtins.stylua"),
+		rust = require("format.builtins.rustfmt"),
 		javascript = require("format.builtins.prettier"),
 		typescript = require("format.builtins.prettier"),
-		rust = require("format.builtins.rustfmt"),
 		-- ...
 	},
 })

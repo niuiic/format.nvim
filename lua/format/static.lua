@@ -1,4 +1,5 @@
 local config = {
+	update_on_buf_changed = false,
 	hooks = {
 		---@type fun(code: integer, signal: integer) | nil
 		on_success = function()
