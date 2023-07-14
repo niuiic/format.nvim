@@ -1,4 +1,4 @@
-local core = require("niuiic-core")
+local core = require("core")
 local static = require("format.static")
 
 ---@class format.config

@@ -4,7 +4,7 @@ An asynchronous, multitasking, and highly configurable formatting plugin.
 
 ## Dependencies
 
-- [niuiic-core.nvim](https://github.com/niuiic/niuiic-core.nvim)
+- [core.nvim](https://github.com/niuiic/core.nvim)
 
 ## Usage
 

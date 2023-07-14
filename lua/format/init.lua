@@ -1,5 +1,5 @@
 local static = require("format.static")
-local core = require("niuiic-core")
+local core = require("core")
 local job = require("format.job")
 local utils = require("format.utils")
 local uv = vim.loop
