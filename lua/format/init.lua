@@ -9,7 +9,11 @@ local setup = function(new_config)
 end
 
 local cp_file = function(bufnr, file_path)
-	local new_file_path = utils.parent_path(file_path) .. "/_" .. utils.file_name(file_path)
+	local new_file_path = core.file.dir(file_path)
+		.. "/_"
+		.. core.file.name(file_path)
+		.. "."
+		.. core.file.extension(file_path)
 	utils.copy_buf_to_file(bufnr, new_file_path)
 	return new_file_path
 end

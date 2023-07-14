@@ -1,11 +1,4 @@
 local static = require("format.static")
-local file_name = function(file_path)
-	return string.match(file_path, "([^/]+)$")
-end
-
-local parent_path = function(file_path)
-	return string.match(file_path, "^(.+)/[^/]+$")
-end
 
 local buf_is_valid = function(bufnr, changed_tick)
 	if not vim.api.nvim_buf_is_valid(bufnr) then
@@ -37,8 +30,6 @@ local copy_buf_to_file = function(bufnr, file_path)
 end
 
 return {
-	file_name = file_name,
-	parent_path = parent_path,
 	buf_is_valid = buf_is_valid,
 	lists_are_same = lists_are_same,
 	copy_buf_to_file = copy_buf_to_file,
