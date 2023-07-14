@@ -16,7 +16,7 @@ Default configuration here.
 
 ```lua
 require("format").setup({
-	update_on_buf_changed = false,
+	allow_update_if_buf_changed = false,
 	hooks = {
 		---@type fun(code: integer, signal: integer) | nil
 		on_success = function()
