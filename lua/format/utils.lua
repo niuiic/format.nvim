@@ -1,3 +1,4 @@
+local static = require("format.static")
 local file_name = function(file_path)
 	return string.match(file_path, "([^/]+)$")
 end
@@ -10,7 +11,7 @@ local buf_is_valid = function(bufnr, changed_tick)
 	if not vim.api.nvim_buf_is_valid(bufnr) then
 		return false, "Buffer is not valid"
 	end
-	if changed_tick ~= vim.api.nvim_buf_get_changedtick(bufnr) then
+	if not static.config.allow_update_if_buf_changed and changed_tick ~= vim.api.nvim_buf_get_changedtick(bufnr) then
 		return false, "Buffer has changed during formatting"
 	end
 	return true

@@ -25,7 +25,7 @@ local use_on_job_success = function(temp_file, bufnr, changed_tick)
 
 		local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
 		local new_lines = vim.fn.readfile(temp_file)
-		if static.config.allow_update_if_buf_changed or not utils.lists_are_same(lines, new_lines) then
+		if not utils.lists_are_same(lines, new_lines) then
 			vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, new_lines)
 		end
 
