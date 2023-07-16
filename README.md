@@ -68,7 +68,7 @@ javascript = function(file_path)
 				"--fix",
 				file_path,
 			},
-			-- just try to fix error with eslint, ignore the errors if it succeed or not
+			-- just try to fix error with eslint, ignore the errors whether it succeed or not
 			ignore_err = function()
 				return true
 			end,
