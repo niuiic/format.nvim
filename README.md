@@ -85,4 +85,5 @@ end
 4. Remove the file.
 
 > Why create a temp file?
+
 > This plugin is designed to apply various commands to the buffer. Some commands, like `cargo fix`, cannot work if file not exists.
