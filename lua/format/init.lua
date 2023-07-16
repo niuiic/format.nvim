@@ -3,6 +3,7 @@ local core = require("core")
 local job = require("format.job")
 local utils = require("format.utils")
 local uv = vim.loop
+local diff = require("format.diff")
 
 local setup = function(new_config)
 	static.config = vim.tbl_deep_extend("force", static.config, new_config or {})
@@ -29,8 +30,9 @@ local use_on_job_success = function(temp_file, bufnr, changed_tick)
 
 		local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
 		local new_lines = vim.fn.readfile(temp_file)
-		if not utils.lists_are_same(lines, new_lines) then
-			vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, new_lines)
+		local result = diff.compute_diff(lines, new_lines)
+		if diff.has_diff(result) then
+			vim.lsp.util.apply_text_edits({ result }, bufnr, "utf-8")
 		end
 
 		uv.fs_unlink(temp_file)
