@@ -77,7 +77,7 @@ javascript = function(file_path)
 		---@field options {env?: table<string, any>, cwd?: string, uid?: number, gid?: number, verbatim?: boolean, detached?: boolean, hide?: boolean, timeout?: number} | nil
 		---@field on_success fun(code: integer, signal: integer) | nil
 		---@field on_err fun(err: string | nil, data: string | nil) | nil
-		---@field ignore_err fun(err: string | nil, data: string | nil): boolean | nil
+		---@field ignore_err (fun(err: string | nil, data: string | nil): boolean) | nil
 		{
 			cmd = "prettier",
 			args = {
@@ -112,7 +112,7 @@ end
 
 ## Example to use with lsp format
 
-This plugin will not have lsp formatting built in. You can configure it like this to use both formatting functions at the same time.
+This plugin has no lsp formatting feature built in. You can configure it like this to use both formatting functions at the same time.
 
 ```lua
 local filetypes_use_lsp_format = {
