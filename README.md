@@ -12,6 +12,17 @@ Just call `require("format").format()`.
 
 The plugin applies changes with lsp api, thus the buffer's folding, highlighting, etc, will not be affected. (Same effect as `null-ls.nvim`).
 
+## How it works
+
+1. Copy buffer content into a temp file.
+2. Apply commands to this file.
+3. Read file and write back to the buffer.
+4. Remove the file.
+
+> Why create a temp file?
+>
+> This plugin is designed to apply various commands to the buffer. Some commands, like `cargo fix`, cannot work if file not exists.
+
 ## Config
 
 Default configuration here.
@@ -98,14 +109,3 @@ javascript = function(file_path)
 	}
 end
 ```
-
-## How it works
-
-1. Copy buffer content into a temp file.
-2. Apply commands to this file.
-3. Read file and write back to the buffer.
-4. Remove the file.
-
-> Why create a temp file?
->
-> This plugin is designed to apply various commands to the buffer. Some commands, like `cargo fix`, cannot work if file not exists.
