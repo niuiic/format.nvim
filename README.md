@@ -109,3 +109,26 @@ javascript = function(file_path)
 	}
 end
 ```
+
+## Example to use with lsp format
+
+This plugin will not have lsp formatting built in. You can configure it like this to use both formatting functions at the same time.
+
+```lua
+local filetypes_use_lsp_format = {
+	"c",
+	"cpp",
+}
+local format = function()
+	local core = require("core")
+	if
+		core.lua.list.includes(filetypes_use_lsp_format, function(filetype)
+			return filetype == vim.bo.filetype
+		end)
+	then
+		vim.lsp.buf.format()
+	else
+		require("format").format()
+	end
+end
+```

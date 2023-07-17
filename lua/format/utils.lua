@@ -11,7 +11,7 @@ local buf_is_valid = function(bufnr, changed_tick)
 end
 
 local copy_buf_to_file = function(bufnr, file_path)
-local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+	local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
 	vim.fn.writefile(lines, file_path)
 end
 
