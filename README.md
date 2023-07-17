@@ -19,6 +19,16 @@ Default configuration here.
 ```lua
 require("format").setup({
 	allow_update_if_buf_changed = false,
+	-- function to calculate path of the temp file
+	temp_file = function(file_path)
+		local core = require("core")
+		local new_file_path = core.file.dir(file_path)
+			.. "/_"
+			.. core.file.name(file_path)
+			.. "."
+			.. core.file.extension(file_path)
+		return new_file_path
+	end,
 	hooks = {
 		---@type fun(code: integer, signal: integer) | nil
 		on_success = function()
@@ -47,8 +57,16 @@ Format configuration sample.
 
 ```lua
 javascript = function(file_path)
+	---@class format.config
 	return {
 		-- the first task
+		---@class format.config
+		---@field cmd string
+		---@field args string[]
+		---@field options {env?: table<string, any>, cwd?: string, uid?: number, gid?: number, verbatim?: boolean, detached?: boolean, hide?: boolean, timeout?: number} | nil
+		---@field on_success fun(code: integer, signal: integer) | nil
+		---@field on_err fun(err: string | nil, data: string | nil) | nil
+		---@field ignore_err fun(err: string | nil, data: string | nil): boolean | nil
 		{
 			cmd = "prettier",
 			args = {
@@ -72,6 +90,10 @@ javascript = function(file_path)
 			ignore_err = function()
 				return true
 			end,
+			-- only the last task's `on_success` and `on_err` works
+			on_success = function()
+				print("format success")
+			end,
 		},
 	}
 end
@@ -85,5 +107,5 @@ end
 4. Remove the file.
 
 > Why create a temp file?
-
+>
 > This plugin is designed to apply various commands to the buffer. Some commands, like `cargo fix`, cannot work if file not exists.

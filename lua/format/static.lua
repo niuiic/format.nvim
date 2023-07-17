@@ -1,5 +1,14 @@
 local config = {
 	allow_update_if_buf_changed = false,
+	temp_file = function(file_path)
+		local core = require("core")
+		local new_file_path = core.file.dir(file_path)
+			.. "/_"
+			.. core.file.name(file_path)
+			.. "."
+			.. core.file.extension(file_path)
+		return new_file_path
+	end,
 	hooks = {
 		---@type fun(code: integer, signal: integer) | nil
 		on_success = function()
