@@ -37,7 +37,13 @@ Only work in `v` mode, not `V` or `C-v`.
 
 ## Config
 
+See builtins at `lua/format/builtins`.
+
+> There are no much builtins, but you can add your favorite formatting tools easily, as long as you know how to format files with the command line.
+
 Default configuration here.
+
+> See the full configuration at `lua/format/static.lua`
 
 ```lua
 require("format").setup({
@@ -80,8 +86,6 @@ require("format").setup({
 
 Format configuration sample.
 
-> There are no much builtins, but you can add your favorite formatting tools easily, as long as you know how to format files with the command line.
->
 > You can debug your configuration with `on_err` option.
 
 ```lua

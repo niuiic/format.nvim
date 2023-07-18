@@ -54,6 +54,15 @@ local config = {
 		sql = require("format.builtins.sqlfluff"),
 		-- taplo
 		toml = require("format.builtins.taplo"),
+		-- clang-format
+		c = require("format.builtins.clang_format"),
+		cpp = require("format.builtins.clang_format"),
+		glsl = require("format.builtins.clang_format"),
+		wgsl = require("format.builtins.clang_format"),
+		-- golines
+		go = require("format.builtins.golines"),
+		-- nginxbeautifier
+		nginx = require("format.builtins.nginxbeautifier"),
 	},
 }
 
