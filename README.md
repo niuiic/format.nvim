@@ -6,11 +6,23 @@ An asynchronous, multitasking, and highly configurable formatting plugin.
 
 - [niuiic/core.nvim](https://github.com/niuiic/core.nvim)
 
-## Usage
+## Features
 
-Just call `require("format").format()`.
+### Format entire file
+
+Call `require("format").format()`.
 
 The plugin applies changes with lsp api, thus the buffer's folding, highlighting, etc, will not be affected. (Same effect as `null-ls.nvim`).
+
+### Format range
+
+Call `require("format").format_range()`.
+
+Only format selected area.
+
+Only work in `v` mode, not `V` or `C-v`.
+
+<img src="https://github.com/niuiic/assets/blob/main/format.nvim/format-range.gif" />
 
 ## How it works
 
@@ -30,6 +42,8 @@ Default configuration here.
 ```lua
 require("format").setup({
 	allow_update_if_buf_changed = false,
+	-- utf-8 | utf-16 | utf-32
+	offset_encoding = "utf-8",
 	-- function to calculate path of the temp file
 	temp_file = function(file_path)
 		local core = require("core")
