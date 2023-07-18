@@ -4,7 +4,7 @@ An asynchronous, multitasking, and highly configurable formatting plugin.
 
 ## Dependencies
 
-- [core.nvim](https://github.com/niuiic/core.nvim)
+- [niuiic/core.nvim](https://github.com/niuiic/core.nvim)
 
 ## Usage
 
@@ -101,7 +101,8 @@ javascript = function(file_path)
 			ignore_err = function()
 				return true
 			end,
-			-- only the last task's `on_success` and `on_err` works
+			-- only the last task's `on_success` works
+            -- all tasks's `on_err` works
 			on_success = function()
 				print("format success")
 			end,
