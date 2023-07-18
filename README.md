@@ -24,6 +24,16 @@ Only work in `v` mode, not `V` or `C-v`.
 
 <img src="https://github.com/niuiic/assets/blob/main/format.nvim/format-range.gif" />
 
+### Multitasking
+
+1. What is multitasking?
+
+That means you can use more than one tools to "format" code at one time.
+
+2. Why do you need this feature?
+
+The most common need, if you are writing js/ts, `prettier` may cause eslint error, if `eslint fix` is called after `prettier`, everything goes well.
+
 ## How it works
 
 1. Copy buffer content into a temp file.
