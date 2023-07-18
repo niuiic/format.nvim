@@ -26,7 +26,11 @@ local use_on_job_success = function(temp_file, bufnr, changed_tick)
 
 		local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
 		local new_lines = vim.fn.readfile(temp_file)
-		local result = diff.compute_diff(lines, new_lines)
+		local success, result = pcall(diff.compute_diff, lines, new_lines)
+		if not success then
+			uv.fs_unlink(temp_file)
+			return false
+		end
 		if diff.has_diff(result) then
 			vim.lsp.util.apply_text_edits({ result }, bufnr, "utf-8")
 		end

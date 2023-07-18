@@ -56,6 +56,8 @@ spawn = function(conf_list, on_success, on_err)
 			else
 				if config.on_err then
 					config.on_err(nil, nil)
+				else
+					static.config.hooks.on_err(nil, nil)
 				end
 			end
 			running = false
