@@ -40,10 +40,10 @@ local use_on_job_success = function(temp_file, bufnr, changed_tick)
 	end
 end
 
-local format = function()
+local ready = function()
 	if job.is_running() then
 		vim.notify("Previous formatting job is running", vim.log.levels.WARN, { title = "Format" })
-		return
+		return false
 	end
 
 	local supported_filetypes = core.lua.table.keys(static.config.filetypes)
@@ -51,15 +51,32 @@ local format = function()
 		return ft == vim.bo.filetype
 	end) then
 		vim.notify("This filetype is not supported", vim.log.levels.ERROR, { title = "Format" })
+		return false
+	end
+
+	local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+	if #lines == 1 and lines[1] == "" then
+		vim.notify("Nothing to format", vim.log.levels.WARN, { title = "Format" })
+		return false
+	end
+
+	return true
+end
+
+local format = function()
+	if not ready() then
 		return
 	end
 
 	local changed_tick = vim.api.nvim_buf_get_changedtick(0)
 	local bufnr = vim.api.nvim_win_get_buf(0)
 	local file_path = vim.api.nvim_buf_get_name(0)
+
 	local temp_file = cp_file(bufnr, file_path)
+
 	local conf_list = static.config.filetypes[vim.bo.filetype](temp_file)
 	local on_job_success = use_on_job_success(temp_file, bufnr, changed_tick)
+
 	job.spawn(conf_list, on_job_success, function()
 		uv.fs_unlink(temp_file)
 	end)
