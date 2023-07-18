@@ -64,6 +64,14 @@ local format_range = function()
 		return
 	end
 
+	local mode = vim.fn.mode()
+	if mode ~= "v" then
+		vim.notify("Cannot work in mode " .. mode, vim.log.levels.ERROR, {
+			title = "Format",
+		})
+		return
+	end
+
 	local changed_tick = vim.api.nvim_buf_get_changedtick(0)
 	local bufnr = vim.api.nvim_win_get_buf(0)
 	local file_path = vim.api.nvim_buf_get_name(0)
