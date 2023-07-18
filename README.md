@@ -102,7 +102,7 @@ javascript = function(file_path)
 				return true
 			end,
 			-- only the last task's `on_success` works
-            -- all tasks's `on_err` works
+			-- all tasks's `on_err` works
 			on_success = function()
 				print("format success")
 			end,
