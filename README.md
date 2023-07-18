@@ -80,6 +80,10 @@ require("format").setup({
 
 Format configuration sample.
 
+> There are no much builtins, but you can add your favorite formatting tools easily, as long as you know how to format files with the command line.
+>
+> You can debug your configuration with `on_err` option.
+
 ```lua
 javascript = function(file_path)
 	---@class format.config
