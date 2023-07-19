@@ -105,19 +105,15 @@ local format_range = function()
 		end
 		local buf_lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
 		local new_lines = {}
-		core.lua.list.each(buf_lines, function(line, index)
-			if index < s_start.row then
-				table.insert(new_lines, line)
-			end
-		end)
+		for i = 1, s_start.row - 1, 1 do
+			table.insert(new_lines, buf_lines[i])
+		end
 		core.lua.list.each(file_lines, function(line)
 			table.insert(new_lines, line)
 		end)
-		core.lua.list.each(buf_lines, function(line, index)
-			if index > s_end.row then
-				table.insert(new_lines, line)
-			end
-		end)
+		for i = s_end.row + 1, #buf_lines, 1 do
+			table.insert(new_lines, buf_lines[i])
+		end
 		vim.fn.writefile(new_lines, temp_file)
 
 		return on_job_success()
