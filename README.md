@@ -38,12 +38,12 @@ The most common need, if you are writing js/ts, `prettier` may cause eslint erro
 
 1. Copy buffer content into a temp file.
 2. Apply commands to this file.
-3. Read file and write back to the buffer.
+3. Read the file and write back to the buffer.
 4. Remove the file.
 
 > Why create a temp file?
 >
-> This plugin is designed to apply various commands to the buffer. Some commands, like `cargo fix`, cannot work if file not exists.
+> This plugin is designed to apply various commands to the buffer. Some commands, like `cargo fix`, cannot work if file does not exist.
 
 ## Config
 
