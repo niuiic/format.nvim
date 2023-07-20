@@ -63,6 +63,7 @@ local config = {
 		go = require("format.builtins.golines"),
 		-- nginxbeautifier
 		nginx = require("format.builtins.nginxbeautifier"),
+		elixir = require("format.builtins.mixformat"),
 	},
 }
 
