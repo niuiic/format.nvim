@@ -100,7 +100,6 @@ Format configuration sample.
 
 ```lua
 javascript = function(file_path)
-	---@class format.config
 	return {
 		-- the first task
 		---@class format.config
