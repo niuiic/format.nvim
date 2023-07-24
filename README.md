@@ -12,7 +12,7 @@ An asynchronous, multitasking, and highly configurable formatting plugin.
 
 Call `require("format").format()`.
 
-The plugin applies changes with lsp api, thus the buffer's folding, highlighting, etc, will not be affected. (Same effect as `null-ls.nvim`).
+The plugin only modifies changed parts, thus the buffer's folding, highlighting, etc, will not be affected.
 
 ### Format range
 
