@@ -166,13 +166,7 @@ local compute_diff = function(old_lines, new_lines, bufnr)
 end
 
 local has_diff = function(diff)
-	if diff.newText ~= "" then
-		return true
-	end
-	if diff.range["end"].character ~= diff.range.start.character or diff.range["end"].line ~= diff.range.start.line then
-		return true
-	end
-	return false
+	return not (diff.newText == "" and diff.rangeLength == 0)
 end
 
 return {

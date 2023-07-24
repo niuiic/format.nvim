@@ -58,8 +58,6 @@ Default configuration here.
 ```lua
 require("format").setup({
 	allow_update_if_buf_changed = false,
-	-- utf-8 | utf-16 | utf-32
-	offset_encoding = "utf-8",
 	-- function to calculate path of the temp file
 	temp_file = function(file_path)
 		local core = require("core")

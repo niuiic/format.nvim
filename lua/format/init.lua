@@ -32,7 +32,7 @@ local use_on_job_success = function(temp_file, bufnr, changed_tick)
 			return false
 		end
 		if diff.has_diff(result) then
-			ok = pcall(vim.lsp.util.apply_text_edits, { result }, bufnr, static.config.offset_encoding)
+			ok = pcall(vim.lsp.util.apply_text_edits, { result }, bufnr, utils.offset_encoding())
 			if not ok then
 				uv.fs_unlink(temp_file)
 				return false

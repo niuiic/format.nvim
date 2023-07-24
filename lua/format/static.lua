@@ -1,6 +1,5 @@
 local config = {
 	allow_update_if_buf_changed = false,
-	offset_encoding = "utf-8",
 	temp_file = function(file_path)
 		local core = require("core")
 		local new_file_path = core.file.dir(file_path)
