@@ -26,13 +26,17 @@ local use_on_job_success = function(temp_file, bufnr, changed_tick)
 
 		local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
 		local new_lines = vim.fn.readfile(temp_file)
-		local success, result = pcall(diff.compute_diff, lines, new_lines)
-		if not success then
+		local ok, result = pcall(diff.compute_diff, lines, new_lines, bufnr)
+		if not ok then
 			uv.fs_unlink(temp_file)
 			return false
 		end
 		if diff.has_diff(result) then
-			vim.lsp.util.apply_text_edits({ result }, bufnr, static.config.offset_encoding)
+			ok = pcall(vim.lsp.util.apply_text_edits, { result }, bufnr, static.config.offset_encoding)
+			if not ok then
+				uv.fs_unlink(temp_file)
+				return false
+			end
 		end
 
 		uv.fs_unlink(temp_file)

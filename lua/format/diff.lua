@@ -118,8 +118,16 @@ local compute_length = function(lines, start_line, start_char, end_line, end_cha
 	return result
 end
 
-local compute_diff = function(old_lines, new_lines, line_ending)
-	line_ending = line_ending or "\n"
+local compute_diff = function(old_lines, new_lines, bufnr)
+	local format_line_ending = {
+		["unix"] = "\n",
+		["dos"] = "\r\n",
+		["mac"] = "\r",
+	}
+
+	local line_ending = format_line_ending[vim.api.nvim_get_option_value("fileformat", {
+		buf = bufnr,
+	})] or "\n"
 
 	local start_line, start_char = first_difference(old_lines, new_lines)
 	local end_line, end_char = last_difference(
