@@ -56,9 +56,24 @@ local offset_encoding = function()
 	return "utf-16"
 end
 
+local temp_file
+
+local create_temp_file = function(file_path, bufnr, selection)
+	local new_file_path = static.config.temp_file(file_path)
+	copy_to_file(new_file_path, bufnr, selection)
+	temp_file = new_file_path
+	return new_file_path
+end
+
+local get_temp_file = function()
+	return temp_file
+end
+
 return {
 	buf_is_valid = buf_is_valid,
 	copy_to_file = copy_to_file,
 	ready = ready,
 	offset_encoding = offset_encoding,
+	create_temp_file = create_temp_file,
+	get_temp_file = get_temp_file,
 }

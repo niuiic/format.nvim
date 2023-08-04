@@ -9,12 +9,6 @@ local setup = function(new_config)
 	static.config = vim.tbl_deep_extend("force", static.config, new_config or {})
 end
 
-local create_temp_file = function(file_path, bufnr, selection)
-	local new_file_path = static.config.temp_file(file_path)
-	utils.copy_to_file(new_file_path, bufnr, selection)
-	return new_file_path
-end
-
 local use_on_job_success = function(temp_file, bufnr, changed_tick)
 	return function()
 		local valid, err = utils.buf_is_valid(bufnr, changed_tick)
@@ -53,7 +47,7 @@ local format = function()
 	local bufnr = vim.api.nvim_win_get_buf(0)
 	local file_path = vim.api.nvim_buf_get_name(0)
 
-	local temp_file = create_temp_file(file_path, bufnr)
+	local temp_file = utils.create_temp_file(file_path, bufnr)
 
 	local conf_list = static.config.filetypes[vim.bo.filetype](temp_file)
 	local on_job_success = use_on_job_success(temp_file, bufnr, changed_tick)
@@ -94,13 +88,16 @@ local format_range = function()
 	local before_start = string.sub(first_line, 0, s_start.col - 1)
 	local after_end = string.sub(last_line, s_end.col + 1)
 
-	local temp_file = create_temp_file(file_path, bufnr, selection)
+	local temp_file = utils.create_temp_file(file_path, bufnr, selection)
 
 	local conf_list = static.config.filetypes[vim.bo.filetype](temp_file)
 	local on_job_success = use_on_job_success(temp_file, bufnr, changed_tick)
 
 	job.spawn(conf_list, function()
 		local file_lines = vim.fn.readfile(temp_file)
+		if not file_lines then
+			return false
+		end
 		if #file_lines == 1 then
 			file_lines[1] = string.format("%s%s%s", before_start, file_lines[1], after_end)
 		else
