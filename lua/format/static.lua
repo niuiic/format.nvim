@@ -62,6 +62,8 @@ local config = {
 		-- nginxbeautifier
 		nginx = require("format.builtins.nginxbeautifier"),
 		elixir = require("format.builtins.mixformat"),
+		-- typstfmt
+		typst = require("format.builtins.typstfmt"),
 	},
 }
 
