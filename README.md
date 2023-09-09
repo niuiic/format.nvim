@@ -65,7 +65,7 @@ require("format").setup({
 			.. "/_"
 			.. core.file.name(file_path)
 			.. "."
-			.. core.file.extension(file_path)
+			.. (core.file.extension(file_path) or "")
 		return new_file_path
 	end,
 	hooks = {
