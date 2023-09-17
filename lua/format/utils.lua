@@ -46,7 +46,14 @@ local ready = function()
 end
 
 local offset_encoding = function()
-	local clients = vim.lsp.get_clients()
+	local clients
+	if vim.lsp.get_clients then
+		clients = vim.lsp.get_clients()
+	elseif vim.lsp.get_active_clients then
+		clients = vim.lsp.get_active_clients()
+	else
+		return "utf-16"
+	end
 	local target = core.lua.list.find(clients, function(client)
 		return client.offset_encoding
 	end)
