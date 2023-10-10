@@ -64,6 +64,8 @@ local config = {
 		elixir = require("format.builtins.mixformat"),
 		-- typstfmt
 		typst = require("format.builtins.typstfmt"),
+		-- alejandra
+		nix = require("format.builtins.alejandra"),
 	},
 }
 
