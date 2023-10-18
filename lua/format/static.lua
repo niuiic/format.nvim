@@ -49,6 +49,7 @@ local config = {
 		-- shfmt
 		sh = require("format.builtins.shfmt"),
 		zsh = require("format.builtins.shfmt"),
+		dockerfile = require("format.builtins.shfmt"),
 		-- sqlfluff
 		sql = require("format.builtins.sqlfluff"),
 		-- taplo
