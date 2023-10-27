@@ -39,6 +39,7 @@ local config = {
 		less = require("format.builtins.prettier"),
 		html = require("format.builtins.prettier"),
 		json = require("format.builtins.prettier"),
+		jsonc = require("format.builtins.prettier"),
 		graphql = require("format.builtins.prettier"),
 		yaml = require("format.builtins.prettier"),
 		dot = require("format.builtins.prettier"),
