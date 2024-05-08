@@ -13,7 +13,7 @@ local use_on_job_success = function(temp_file, bufnr, changed_tick)
 	return function()
 		local valid, err = utils.buf_is_valid(bufnr, changed_tick)
 		if not valid then
-			vim.notify(err, vim.log.levels.ERROR, { title = "Format" })
+			vim.notify(err or "", vim.log.levels.ERROR, { title = "Format" })
 			uv.fs_unlink(temp_file)
 			return false
 		end
@@ -75,7 +75,7 @@ local format_range = function()
 	local file_path = vim.api.nvim_buf_get_name(0)
 
 	local selection = core.text.selection()
-	local pos = core.text.selected_area(bufnr)
+	local pos = core.text.selected_area()
 	if not pos then
 		return false
 	end
