@@ -2,6 +2,8 @@
 
 An asynchronous, multitasking, and highly configurable formatting plugin.
 
+[More neovim plugins](https://github.com/niuiic/awesome-neovim-plugins)
+
 ## Dependencies
 
 - [niuiic/core.nvim](https://github.com/niuiic/core.nvim)
