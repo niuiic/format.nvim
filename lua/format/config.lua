@@ -25,6 +25,14 @@ local default_config = {
 	format_on_save = false,
 	filetypes = {
 		lua = require("format.formatters.stylua"),
+		javascript = require("format.formatters.biome"),
+		typescript = require("format.formatters.biome"),
+		javascriptreact = require("format.formatters.biome"),
+		typescriptreact = require("format.formatters.biome"),
+		css = require("format.formatters.biome"),
+		json = require("format.formatters.biome"),
+		jsonc = require("format.formatters.biome"),
+		glsl = require("format.formatters.lsp"),
 	},
 }
 
