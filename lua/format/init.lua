@@ -18,6 +18,12 @@ M.format = function(callback)
 	}
 	local changed_tick = vim.api.nvim_buf_get_changedtick(0)
 	local apply_diff = vim.schedule_wrap(function(...)
+		if not ... then
+			if callback then
+				callback(context)
+			end
+			return
+		end
 		if M._config:get().force_format or changed_tick == vim.api.nvim_buf_get_changedtick(context.bufnr) then
 			require("format.diff").apply_diff(...)
 			if callback then

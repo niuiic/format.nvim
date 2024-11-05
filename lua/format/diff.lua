@@ -6,7 +6,10 @@ local M = {}
 ---@param bufnr number
 M.apply_diff = function(old, new, bufnr)
 	local line_ending = M.get_line_ending(bufnr)
-	local diff = M._compute_diff(vim.split(old, line_ending), vim.split(new, line_ending), bufnr)
+	local old_lines = vim.split(old, line_ending)
+	local new_lines = vim.split(new, line_ending)
+	table.remove(new_lines, #new_lines)
+	local diff = M._compute_diff(old_lines, new_lines, bufnr)
 	if not M._has_diff(diff) then
 		return
 	end
