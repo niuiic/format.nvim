@@ -1,11 +1,8 @@
-local job = require("format.job")
-local utils = require("format.utils")
-
-vim.api.nvim_create_autocmd({ "VimLeave" }, {
-	pattern = { "*" },
+vim.api.nvim_create_autocmd("BufWritePost", {
 	callback = function()
-		if job.is_running() then
-			pcall(vim.loop.fs_unlink, utils.get_temp_file())
+		local config = require("format")._config:get()
+		if config.format_on_save and config.filetypes[vim.bo.filetype] then
+			require("format").format()
 		end
 	end,
 })

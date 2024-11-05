@@ -1,6 +1,75 @@
--- From null-ls.nvim
+local M = {}
 
-local first_difference = function(old_lines, new_lines)
+-- % apply_diff %
+---@param old string
+---@param new string
+---@param bufnr number
+M.apply_diff = function(old, new, bufnr)
+	local line_ending = M.get_line_ending(bufnr)
+	local diff = M._compute_diff(vim.split(old, line_ending), vim.split(new, line_ending), bufnr)
+	if not M._has_diff(diff) then
+		return
+	end
+	pcall(vim.lsp.util.apply_text_edits, { diff }, bufnr, M._offset_encoding())
+end
+
+-- % offset_encoding %
+M._offset_encoding = function()
+	local clients = vim.lsp.get_clients()
+	local target = vim.iter(clients):find(function(client)
+		return client.offset_encoding
+	end)
+	if target then
+		return target.offset_encoding
+	end
+	return "utf-16"
+end
+
+-- % has_diff %
+M._has_diff = function(diff)
+	return not (diff.newText == "" and diff.rangeLength == 0)
+end
+
+-- % compute_diff %
+M._compute_diff = function(old_lines, new_lines, bufnr)
+	local start_line, start_char = M._first_difference(old_lines, new_lines)
+	local end_line, end_char = M._last_difference(
+		vim.list_slice(old_lines, start_line, #old_lines),
+		vim.list_slice(new_lines, start_line, #new_lines),
+		start_char
+	)
+	local line_ending = M.get_line_ending(bufnr)
+	local text = M._extract_text(new_lines, start_line, start_char, end_line, end_char, line_ending)
+	local length = M._compute_length(old_lines, start_line, start_char, end_line, end_char)
+
+	local adj_end_line = #old_lines + end_line
+	local adj_end_char
+	if end_line == 0 then
+		adj_end_char = 0
+	else
+		adj_end_char = #old_lines[#old_lines + end_line + 1] + end_char + 1
+	end
+
+	local _, adjusted_start_char = vim.str_utfindex(old_lines[start_line], start_char - 1)
+	local _, adjusted_end_char = vim.str_utfindex(old_lines[#old_lines + end_line + 1], adj_end_char)
+	---@diagnostic disable-next-line: cast-local-type
+	start_char = adjusted_start_char
+	---@diagnostic disable-next-line: cast-local-type
+	end_char = adjusted_end_char
+
+	local result = {
+		range = {
+			start = { line = start_line - 1, character = start_char },
+			["end"] = { line = adj_end_line, character = end_char },
+		},
+		newText = text,
+		rangeLength = length + 1,
+	}
+
+	return result
+end
+
+M._first_difference = function(old_lines, new_lines)
 	local line_count = math.min(#old_lines, #new_lines)
 	if line_count == 0 then
 		return 1, 1
@@ -29,7 +98,7 @@ local first_difference = function(old_lines, new_lines)
 	return start_line_idx, start_col_idx
 end
 
-local last_difference = function(old_lines, new_lines, start_char)
+M._last_difference = function(old_lines, new_lines, start_char)
 	local line_count = math.min(#old_lines, #new_lines)
 	if line_count == 0 then
 		return 0, 0
@@ -70,7 +139,7 @@ local last_difference = function(old_lines, new_lines, start_char)
 	return end_line_idx, end_col_idx
 end
 
-local extract_text = function(lines, start_line, start_char, end_line, end_char, line_ending)
+M._extract_text = function(lines, start_line, start_char, end_line, end_char, line_ending)
 	if start_line == #lines + end_line + 1 then
 		if end_line == 0 then
 			return ""
@@ -95,7 +164,7 @@ local extract_text = function(lines, start_line, start_char, end_line, end_char,
 	return result
 end
 
-local compute_length = function(lines, start_line, start_char, end_line, end_char)
+M._compute_length = function(lines, start_line, start_char, end_line, end_char)
 	local adj_end_line = #lines + end_line + 1
 
 	local adj_end_char
@@ -118,7 +187,7 @@ local compute_length = function(lines, start_line, start_char, end_line, end_cha
 	return result
 end
 
-local compute_diff = function(old_lines, new_lines, bufnr)
+M.get_line_ending = function(bufnr)
 	local format_line_ending = {
 		["unix"] = "\n",
 		["dos"] = "\r\n",
@@ -129,47 +198,7 @@ local compute_diff = function(old_lines, new_lines, bufnr)
 		buf = bufnr,
 	})] or "\n"
 
-	local start_line, start_char = first_difference(old_lines, new_lines)
-	local end_line, end_char = last_difference(
-		vim.list_slice(old_lines, start_line, #old_lines),
-		vim.list_slice(new_lines, start_line, #new_lines),
-		start_char
-	)
-	local text = extract_text(new_lines, start_line, start_char, end_line, end_char, line_ending)
-	local length = compute_length(old_lines, start_line, start_char, end_line, end_char)
-
-	local adj_end_line = #old_lines + end_line
-	local adj_end_char
-	if end_line == 0 then
-		adj_end_char = 0
-	else
-		adj_end_char = #old_lines[#old_lines + end_line + 1] + end_char + 1
-	end
-
-	local _, adjusted_start_char = vim.str_utfindex(old_lines[start_line], start_char - 1)
-	local _, adjusted_end_char = vim.str_utfindex(old_lines[#old_lines + end_line + 1], adj_end_char)
-	---@diagnostic disable-next-line: cast-local-type
-	start_char = adjusted_start_char
-	---@diagnostic disable-next-line: cast-local-type
-	end_char = adjusted_end_char
-
-	local result = {
-		range = {
-			start = { line = start_line - 1, character = start_char },
-			["end"] = { line = adj_end_line, character = end_char },
-		},
-		newText = text,
-		rangeLength = length + 1,
-	}
-
-	return result
+	return line_ending
 end
 
-local has_diff = function(diff)
-	return not (diff.newText == "" and diff.rangeLength == 0)
-end
-
-return {
-	compute_diff = compute_diff,
-	has_diff = has_diff,
-}
+return M
