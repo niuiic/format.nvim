@@ -9,8 +9,12 @@ vim.api.nvim_create_autocmd("BufWritePost", {
 				return
 			end
 			require("format").format(function()
-				bufs[args.buf] = true
-				vim.cmd("silent w")
+				local ok = pcall(function()
+					vim.cmd("silent w")
+				end)
+				if ok then
+					bufs[args.buf] = true
+				end
 			end)
 		end
 	end,
