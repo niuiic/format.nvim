@@ -5,6 +5,10 @@ local M = {}
 ---@param new string
 ---@param bufnr number
 M.apply_diff = function(old, new, bufnr)
+	if old == "" and new == "" then
+		return
+	end
+
 	local line_ending = M.get_line_ending(bufnr)
 	local old_lines = vim.split(old, line_ending)
 	local new_lines = vim.split(new, line_ending)
