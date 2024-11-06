@@ -8,7 +8,9 @@ M.apply_diff = function(old, new, bufnr)
 	local line_ending = M.get_line_ending(bufnr)
 	local old_lines = vim.split(old, line_ending)
 	local new_lines = vim.split(new, line_ending)
-	table.remove(new_lines, #new_lines)
+	if new_lines[#new_lines] == "" then
+		table.remove(new_lines, #new_lines)
+	end
 	local diff = M._compute_diff(old_lines, new_lines, bufnr)
 	if not M._has_diff(diff) then
 		return
@@ -190,6 +192,7 @@ M._compute_length = function(lines, start_line, start_char, end_line, end_char)
 	return result
 end
 
+-- % get_line_ending %
 M.get_line_ending = function(bufnr)
 	local format_line_ending = {
 		["unix"] = "\n",
