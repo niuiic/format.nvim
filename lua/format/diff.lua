@@ -1,10 +1,10 @@
 local M = {}
 
--- % apply_diff %
+-- % apply_change %
 ---@param old string
 ---@param new string
 ---@param bufnr number
-M.apply_diff = function(old, new, bufnr)
+M.apply_change = function(old, new, bufnr)
 	if old == "" and new == "" then
 		return
 	end

@@ -1,4 +1,4 @@
-return function(context, apply_diff)
+return function(context, apply_change)
 	vim.system({
 		"xmlformat",
 		"-",
@@ -6,7 +6,7 @@ return function(context, apply_diff)
 		stdin = context.text,
 	}, function(result)
 		if result.code == 0 then
-			apply_diff(context.text, result.stdout, context.bufnr)
+			apply_change(context.text, result.stdout, context.bufnr)
 		end
 	end)
 end

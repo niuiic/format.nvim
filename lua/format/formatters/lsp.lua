@@ -1,4 +1,4 @@
-return function(context, apply_diff)
+return function(context, apply_change)
 	vim.lsp.buf.format({ bufnr = context.bufnr })
-	apply_diff()
+	apply_change()
 end
