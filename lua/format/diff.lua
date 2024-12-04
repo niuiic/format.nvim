@@ -5,195 +5,9 @@ local M = {}
 ---@param new string
 ---@param bufnr number
 M.apply_change = function(old, new, bufnr)
-	if old == "" and new == "" then
-		return
-	end
-
-	local line_ending = M.get_line_ending(bufnr)
-	local old_lines = vim.split(old, line_ending)
-	local new_lines = vim.split(new, line_ending)
-	if new_lines[#new_lines] == "" then
-		table.remove(new_lines, #new_lines)
-	end
-	local diff = M._compute_diff(old_lines, new_lines, bufnr)
-	if not M._has_diff(diff) then
-		return
-	end
-	pcall(vim.lsp.util.apply_text_edits, { diff }, bufnr, M._offset_encoding())
-end
-
--- % offset_encoding %
-M._offset_encoding = function()
-	local clients = vim.lsp.get_clients()
-	local target = vim.iter(clients):find(function(client)
-		return client.offset_encoding
+	require("omega").diff_text(old, new, function(text_edits)
+		pcall(vim.lsp.util.apply_text_edits, text_edits, bufnr, M._offset_encoding())
 	end)
-	if target then
-		return target.offset_encoding
-	end
-	return "utf-16"
-end
-
--- % has_diff %
-M._has_diff = function(diff)
-	return not (diff.newText == "" and diff.rangeLength == 0)
-end
-
--- % compute_diff %
-M._compute_diff = function(old_lines, new_lines, bufnr)
-	local start_line, start_char = M._first_difference(old_lines, new_lines)
-	local end_line, end_char = M._last_difference(
-		vim.list_slice(old_lines, start_line, #old_lines),
-		vim.list_slice(new_lines, start_line, #new_lines),
-		start_char
-	)
-	local line_ending = M.get_line_ending(bufnr)
-	local text = M._extract_text(new_lines, start_line, start_char, end_line, end_char, line_ending)
-	local length = M._compute_length(old_lines, start_line, start_char, end_line, end_char)
-
-	local adj_end_line = #old_lines + end_line
-	local adj_end_char
-	if end_line == 0 then
-		adj_end_char = 0
-	else
-		adj_end_char = #old_lines[#old_lines + end_line + 1] + end_char + 1
-	end
-
-	local _, adjusted_start_char = vim.str_utfindex(old_lines[start_line], start_char - 1)
-	local _, adjusted_end_char = vim.str_utfindex(old_lines[#old_lines + end_line + 1], adj_end_char)
-	---@diagnostic disable-next-line: cast-local-type
-	start_char = adjusted_start_char
-	---@diagnostic disable-next-line: cast-local-type
-	end_char = adjusted_end_char
-
-	local result = {
-		range = {
-			start = { line = start_line - 1, character = start_char },
-			["end"] = { line = adj_end_line, character = end_char },
-		},
-		newText = text,
-		rangeLength = length + 1,
-	}
-
-	return result
-end
-
-M._first_difference = function(old_lines, new_lines)
-	local line_count = math.min(#old_lines, #new_lines)
-	if line_count == 0 then
-		return 1, 1
-	end
-
-	local start_line_idx
-	for i = 1, line_count do
-		start_line_idx = i
-		if old_lines[start_line_idx] ~= new_lines[start_line_idx] then
-			break
-		end
-	end
-
-	local old_line = old_lines[start_line_idx]
-	local new_line = new_lines[start_line_idx]
-	local length = math.min(#old_line, #new_line)
-
-	local start_col_idx = 1
-	while start_col_idx <= length do
-		if string.sub(old_line, start_col_idx, start_col_idx) ~= string.sub(new_line, start_col_idx, start_col_idx) then
-			break
-		end
-		start_col_idx = start_col_idx + 1
-	end
-
-	return start_line_idx, start_col_idx
-end
-
-M._last_difference = function(old_lines, new_lines, start_char)
-	local line_count = math.min(#old_lines, #new_lines)
-	if line_count == 0 then
-		return 0, 0
-	end
-
-	local end_line_idx = -1
-	for i = end_line_idx, -line_count, -1 do
-		if old_lines[#old_lines + i + 1] ~= new_lines[#new_lines + i + 1] then
-			end_line_idx = i
-			break
-		end
-	end
-
-	local old_line
-	local new_line
-	if end_line_idx <= -line_count then
-		end_line_idx = -line_count
-		old_line = string.sub(old_lines[#old_lines + end_line_idx + 1], start_char)
-		new_line = string.sub(new_lines[#new_lines + end_line_idx + 1], start_char)
-	else
-		old_line = old_lines[#old_lines + end_line_idx + 1]
-		new_line = new_lines[#new_lines + end_line_idx + 1]
-	end
-
-	local old_line_length = #old_line
-	local new_line_length = #new_line
-	local length = math.min(old_line_length, new_line_length)
-	local end_col_idx = -1
-	while end_col_idx >= -length do
-		local old_char = string.sub(old_line, old_line_length + end_col_idx + 1, old_line_length + end_col_idx + 1)
-		local new_char = string.sub(new_line, new_line_length + end_col_idx + 1, new_line_length + end_col_idx + 1)
-		if old_char ~= new_char then
-			break
-		end
-		end_col_idx = end_col_idx - 1
-	end
-
-	return end_line_idx, end_col_idx
-end
-
-M._extract_text = function(lines, start_line, start_char, end_line, end_char, line_ending)
-	if start_line == #lines + end_line + 1 then
-		if end_line == 0 then
-			return ""
-		end
-
-		local line = lines[start_line]
-		local length = #line + end_char - start_char
-		return string.sub(line, start_char, start_char + length + 1)
-	end
-
-	local result = string.sub(lines[start_line], start_char) .. line_ending
-	for line_idx = start_line + 1, #lines + end_line do
-		result = result .. lines[line_idx] .. line_ending
-	end
-
-	if end_line ~= 0 then
-		local line = lines[#lines + end_line + 1]
-		local length = #line + end_char + 1
-		result = result .. string.sub(line, 1, length)
-	end
-
-	return result
-end
-
-M._compute_length = function(lines, start_line, start_char, end_line, end_char)
-	local adj_end_line = #lines + end_line + 1
-
-	local adj_end_char
-	if adj_end_line > #lines then
-		adj_end_char = end_char - 1
-	else
-		adj_end_char = #lines[adj_end_line] + end_char
-	end
-
-	if start_line == adj_end_line then
-		return adj_end_char - start_char + 1
-	end
-
-	local result = #lines[start_line] - start_char + 1
-	for line = start_line + 1, adj_end_line - 1 do
-		result = result + #lines[line] + 1
-	end
-	result = result + adj_end_char + 1
-
-	return result
 end
 
 -- % get_line_ending %
@@ -211,4 +25,17 @@ M.get_line_ending = function(bufnr)
 	return line_ending
 end
 
+-- % offset_encoding %
+M._offset_encoding = function()
+	local clients = vim.lsp.get_clients()
+	local target = vim.iter(clients):find(function(client)
+		return client.offset_encoding
+	end)
+	if target then
+		return target.offset_encoding
+	end
+	return "utf-16"
+end
+
 return M
+
