@@ -4,9 +4,15 @@ local M = {}
 ---@param old string
 ---@param new string
 ---@param bufnr number
-M.apply_change = function(old, new, bufnr)
+---@param callback fun() | nil
+M.apply_change = function(old, new, bufnr, callback)
 	require("omega").diff_text(old, new, function(text_edits)
-		pcall(vim.lsp.util.apply_text_edits, text_edits, bufnr, M._offset_encoding())
+		vim.schedule(function()
+			pcall(vim.lsp.util.apply_text_edits, text_edits, bufnr, M._offset_encoding())
+			if callback then
+				callback()
+			end
+		end)
 	end)
 end
 
@@ -38,4 +44,3 @@ M._offset_encoding = function()
 end
 
 return M
-

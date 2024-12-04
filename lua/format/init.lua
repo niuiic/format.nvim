@@ -17,18 +17,19 @@ M.format = function(callback)
 		file_path = vim.api.nvim_buf_get_name(0),
 	}
 	local changed_tick = vim.api.nvim_buf_get_changedtick(0)
-	local apply_change = vim.schedule_wrap(function(...)
-		if not ... then
+	local apply_change = vim.schedule_wrap(function(old, new, bufnr)
+		if not old and not new and not bufnr then
 			if callback then
 				callback(context)
 			end
 			return
 		end
 		if M._config:get().force_format or changed_tick == vim.api.nvim_buf_get_changedtick(context.bufnr) then
-			require("format.diff").apply_change(...)
-			if callback then
-				callback(context)
-			end
+			require("format.diff").apply_change(old, new, bufnr, function()
+				if callback then
+					callback(context)
+				end
+			end)
 		end
 	end)
 
