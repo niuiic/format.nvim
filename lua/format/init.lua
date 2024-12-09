@@ -9,7 +9,7 @@ local M = {
 
 ---@param callback fun(context: format.Context) | nil
 M.format = function(callback)
-	local line_ending = require("format.diff").get_line_ending(0)
+	local line_ending = require("omega").get_line_ending(0)
 	---@type format.Context
 	local context = {
 		bufnr = vim.api.nvim_get_current_buf(),
@@ -25,7 +25,7 @@ M.format = function(callback)
 			return
 		end
 		if M._config:get().force_format or changed_tick == vim.api.nvim_buf_get_changedtick(context.bufnr) then
-			require("format.diff").apply_change(old, new, bufnr, function()
+			require("format.apply_change").apply_change(old, new, bufnr, function()
 				if callback then
 					callback(context)
 				end
