@@ -6,6 +6,8 @@ local M = {}
 ---@param bufnr number
 ---@param callback fun() | nil
 M.apply_change = function(old, new, bufnr, callback)
+	local line_ending = require("omega").get_line_ending(bufnr)
+	new = new:gsub(line_ending .. "+$", "")
 	require("omega").diff_text(old, new, function(text_edits)
 		vim.schedule(function()
 			pcall(vim.lsp.util.apply_text_edits, text_edits, bufnr, require("omega").get_offset_encoding())
