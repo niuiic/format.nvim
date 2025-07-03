@@ -61,7 +61,7 @@ local default_config = {
 		-- shfmt
 		sh = require("format.formatters.shfmt"),
 		zsh = require("format.formatters.shfmt"),
-		dockerfile = require("format.formatters.shfmt"),
+		dockerfile = require("format.formatters.lsp"),
 	},
 }
 
